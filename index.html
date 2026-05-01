@@ -722,7 +722,13 @@ As for 3:35 (8:11/mi) — that's a significant jump from sub-4. Doable in a futu
       z-index: 2147483647 !important;
       transition: transform 0.15s, box-shadow 0.15s;
     }
-    #coach-btn:hover { transform: scale(1.06); box-shadow: 0 4px 16px rgba(0,0,0,0.22); }
+    @keyframes coachFloat {
+      0%   { transform: translateY(0px); box-shadow: 0 2px 12px rgba(0,0,0,0.18); }
+      50%  { transform: translateY(-6px); box-shadow: 0 8px 20px rgba(0,0,0,0.22); }
+      100% { transform: translateY(0px); box-shadow: 0 2px 12px rgba(0,0,0,0.18); }
+    }
+    #coach-btn { animation: coachFloat 2.8s ease-in-out infinite; }
+    #coach-btn:hover { animation: none; transform: scale(1.08); box-shadow: 0 4px 18px rgba(0,0,0,0.28); }
     #coach-panel {
       position: fixed !important; bottom: 82px !important; right: 24px !important;
       width: 310px; max-height: 440px;
