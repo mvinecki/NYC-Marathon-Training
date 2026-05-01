@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: transparent; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+  @keyframes float {
+    0%   { transform: translateY(0px);   box-shadow: 0 2px 12px rgba(0,0,0,0.18); }
+    50%  { transform: translateY(-6px);  box-shadow: 0 8px 20px rgba(0,0,0,0.24); }
+    100% { transform: translateY(0px);   box-shadow: 0 2px 12px rgba(0,0,0,0.18); }
+  }
+
+  #btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: float 2.8s ease-in-out infinite;
+  }
+  #btn:hover { animation: none; transform: scale(1.08); box-shadow: 0 4px 18px rgba(0,0,0,0.28); }
+
+  #panel {
+    position: fixed;
+    bottom: 82px;
+    right: 24px;
+    width: 310px;
+    height: 420px;
+    background: #faf9f5;
+    border-radius: 14px;
+    border: 1px solid #e8e4dc;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #panel.open { display: flex; }
+
+  #header {
+    background: #faf9f5;
+    border-bottom: 1px solid #e8e4dc;
+    padding: 12px 14px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  #label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #999; margin-bottom: 2px; }
+  #title { color: #1a1a1a; font-weight: 600; font-size: 13px; }
+  #close-btn { background: none; border: none; color: #999; font-size: 18px; cursor: pointer; padding: 2px 5px; border-radius: 4px; line-height: 1; }
+  #close-btn:hover { background: #eee; color: #333; }
+
+  #msgs {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: #ddd transparent;
+  }
+  .msg { display: flex; gap: 6px; }
+  .msg.user { flex-direction: row-reverse; }
+  .bubble { padding: 8px 11px; border-radius: 12px; font-size: 12.5px; line-height: 1.5; max-width: 86%; white-space: pre-wrap; }
+  .msg.bot  .bubble { background: #fff; color: #2a2a2a; border: 1px solid #e8e4dc; border-bottom-left-radius: 3px; }
+  .msg.user .bubble { background: #1a1a1a; color: #fff; border-bottom-right-radius: 3px; }
+  .icon { width: 22px; height: 22px; border-radius: 50%; background: #f0ede8; border: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; margin-top: 2px; }
+
+  #chips { padding: 0 12px 8px; display: flex; flex-wrap: wrap; gap: 4px; flex-shrink: 0; }
+  .chip { background: #fff; color: #555; border: 1px solid #e0dcd5; border-radius: 20px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
+  .chip:hover { background: #f0ede8; color: #1a1a1a; }
+
+  #footer { padding: 9px 12px; border-top: 1px solid #e8e4dc; display: flex; gap: 6px; align-items: center; background: #faf9f5; flex-shrink: 0; }
+  #inp { flex: 1; background: #fff; border: 1px solid #e0dcd5; border-radius: 18px; padding: 7px 12px; color: #1a1a1a; font-size: 12.5px; outline: none; font-family: inherit; }
+  #inp:focus { border-color: #999; }
+  #inp::placeholder { color: #aaa; }
+  #send { width: 30px; height: 30px; border-radius: 50%; background: #1a1a1a; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  #send:hover { background: #333; }
+</style>
+</head>
+<body>
+
+<button id="btn" onclick="toggle()" title="Ask your coach">
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
+    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+  </svg>
+</button>
+
+<div id="panel">
+  <div id="header">
+    <div>
+      <div id="label">NYC 2026</div>
+      <div id="title">Training Coach</div>
+    </div>
+    <button id="close-btn" onclick="toggle()">×</button>
+  </div>
+  <div id="msgs"></div>
+  <div id="chips">
+    <span class="chip" onclick="ask(this)">Where do training principles come from?</span>
+    <span class="chip" onclick="ask(this)">When should I take gels?</span>
+    <span class="chip" onclick="ask(this)">Why two 20-milers?</span>
+    <span class="chip" onclick="ask(this)">What is a tempo run?</span>
+  </div>
+  <div id="footer">
+    <input id="inp" placeholder="Ask your coach..." onkeydown="if(event.key==='Enter')send()"/>
+    <button id="send" onclick="send()">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+var QA = [
+  { k:["principle","philosophy","where.*come","method","source","research","hansons","higdon","pfitzinger","canova","80/20","nick bear","based on","behind.*plan","training.*come","methodology"], a:"This plan blends four elite methodologies:\n\n🏆 Hal Higdon — 10% mileage increase rule, recovery weeks every 3-4 weeks\n🏆 Hansons Method — Two 20-milers to simulate race-day fatigue\n🏆 Pfitzinger — Periodization phases (Base→Build→Peak→Taper), 40+ mile peak weeks\n🏆 Renato Canova — Race-pace miles at the end of long runs (last 2mi @ 9:09/mi, weeks 14-20)\n🏆 Matt Fitzgerald (80/20) — ~80% easy Zone 2, 20% quality work\n🏆 Nick Bear — Integrating strength training with marathon prep" },
+  { k:["gel","fuel","nutrition","eat","carb","energy","chew","maurten","gu","when.*eat","calorie"], a:"Fueling rules:\n\n• Under 60 min → water only\n• 60-75 min → optional gel at 45 min\n• 75+ min → gel every 40-45 min starting mile 5-6\n\n🏁 Race day: gels at miles 5, 10, 15, 20\n\nPractice this EXACT schedule on long runs. Never use a new gel on race day. Good brands: GU, Maurten, Honey Stinger." },
+  { k:["20.?mile","twenty","two 20","second 20","peak.*long","longest"], a:"You have TWO 20-milers — intentional Hansons-style:\n\n📅 Week 16 (Aug 17): First 20-miler. Start at 10:00+/mi. Just finish.\n📅 Week 18 (Aug 31): Second 20-miler. Focus on negative splits.\n\nWhy two? The second builds confidence — by race day 26.2 won't feel foreign." },
+  { k:["tempo","threshold","wednesday","hard run","quality","what.*tempo"], a:"Tempo runs start Wednesday Week 6 (Jun 8).\n\n🔥 Structure: 1-2mi warmup → middle miles at 8:30-9:00/mi → 1mi cooldown\n\nEffort: 7/10, comfortably hard. Tempo raises your lactate threshold — the #1 predictor of marathon performance." },
+  { k:["stride","20 second","6.*stride","neuromuscular","fast"], a:"Strides on Thursdays starting Week 14 (Aug 3).\n\n6 × 20-sec at ~7:30-8:00/mi feel:\n• Smooth 5-sec buildup → hold 10 sec → ease 5 sec\n• 60-90 sec walk rest between each\n\nKeeps fast-twitch fibers active during heavy training." },
+  { k:["recover","recovery week","down week","week 5","week 9","week 13","week 17","week 21"], a:"Recovery weeks: 5, 9, 13, 17, 21 — every 3-4 weeks.\n\n• Mileage drops 20-25%\n• All runs easy, no tempo\n• Lifting stays moderate\n\nYour body adapts DURING recovery, not during hard weeks. Never skip them." },
+  { k:["taper","week 22","week 23","week 24","week 25","week 26","last.*week","before race","race week"], a:"Taper starts Week 22 (Sep 28):\n\nWk 22: 35mi → Wk 23: 28mi → Wk 24: 22mi → Wk 25: 16mi → Wk 26: 10mi\n\nTaper anxiety is normal. Don't add miles. Sleep 9hrs/night. No new foods, shoes, or gear." },
+  { k:["lift","strength","weight","squat","deadlift","gym","phase.*lift","monday","thursday"], a:"Strength in 3 phases:\n\n💪 Phase 1 (Wks 1-9): Heavy, 3-5×6-8 reps — squats, deadlifts, hip thrusts, RDLs\n💪 Phase 2 (Wks 10-20): Moderate, 3×10-12 reps\n💪 Phase 3 (Wks 21-26): Light maintenance, 2×12-15 reps\n\nAlways lift AFTER your run, or 6+ hours apart." },
+  { k:["pace","9:09","sub.?4","goal pace","how fast","minute.*mile","split"], a:"Goal: 9:09/mile for 3:59:59\n\nKey splits:\n• Mile 5 → 0:45:45\n• Mile 10 → 1:31:30\n• Half → 2:00:00\n• Mile 20 → 3:03:00\n• Finish → 3:59:59\n\nZones: Easy 10:30-11:30 · Long Run 10:00-10:45 · Tempo 8:30-9:00 · Race 9:09/mi" },
+  { k:["mileage","miles.*week","weekly","how many miles","peak","total"], a:"Mileage progression:\n\nBase (Wks 1-5): 15-22 mi/wk\nBuild (Wks 6-13): 25-35 mi/wk\nPeak (Wks 14-20): 37-43 mi/wk\nTaper (Wks 21-26): 35→10 mi/wk\n\nPeak of 43mi is in the optimal 40-50mi range for sub-4." },
+  { k:["long run","saturday","how long","longest run"], a:"Long runs on Saturdays (outside):\n\nWks 1-5: 5-8mi · Wks 6-9: 9-12mi · Wks 10-13: 13-16mi\nWks 14-20: 18-20mi (last 2mi @ race pace)\nTaper: down to 3mi shakeout\n\nKeep effort conversational (10:00-10:45/mi). Builds aerobic base." },
+  { k:["nyc","new york","course","race day","november","bridge","central park","verrazano","staten"], a:"NYC Marathon — Nov 1, 2026:\n\nRoute: Staten Island → Brooklyn → Queens → Bronx → Manhattan → Central Park\n\n🌉 Verrazano Bridge at start — go easy uphill!\n😬 Mile 15 Queensboro Bridge — quiet, mentally tough\n🎉 Mile 16 First Ave — massive crowd energy\n⛰️ Miles 23-26 Central Park hills — hardest when most tired\n\n🌡️ Expect 45-55°F — ideal conditions." },
+  { k:["heat","summer","hot","june","july","august"], a:"Summer training tips:\n\n🌡️ Slow 30-60 sec/mile per 10°F above 60°F\n⏰ Run 5-7am or after 7pm\n💧 Hydrate night before long runs\n🚨 Stop if dizzy, chills, or stop sweating\n\nSilver lining: heat adaptation makes you stronger for cool November race day." },
+  { k:["injury","hurt","pain","miss","sore","knee","shin","what if"], a:"Missed training:\n\n• 1-2 runs → resume normally, don't double up\n• Full week → return at 70% mileage\n• 2 weeks → drop back 2 weeks in plan\n• Minor injury → cross-train at same effort\n• Missed 20-miler → don't make it up in taper, fitness is built" },
+  { k:["rest","rest day","tuesday","day off","sunday"], a:"Rest days:\n• Tuesday: Full rest every week\n• Sunday: Full rest every week\n\nTwo full rest days/week is standard for first-timers lifting 2x/week. Rest is when your body actually builds fitness — don't feel guilty." }
+];
+
+function answer(q) {
+  var ql = q.toLowerCase(), best = null, top = 0;
+  QA.forEach(function(item) {
+    var score = 0;
+    item.k.forEach(function(k) { try { if (new RegExp(k,'i').test(ql)) score++; } catch(e) { if (ql.includes(k)) score++; } });
+    if (score > top) { top = score; best = item; }
+  });
+  return top > 0 ? best.a : "Ask me about: training principles, gel timing, tempo runs, strides, 20-milers, taper, race pacing, strength phases, summer heat, or any specific week!";
+}
+
+var open = false;
+
+function addMsg(txt, role) {
+  var msgs = document.getElementById('msgs');
+  var d = document.createElement('div'); d.className = 'msg ' + role;
+  var ic = document.createElement('div'); ic.className = 'icon'; ic.textContent = role==='bot' ? '🏃' : '👤';
+  var b = document.createElement('div'); b.className = 'bubble'; b.textContent = txt;
+  d.appendChild(ic); d.appendChild(b);
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+  document.getElementById('chips').style.display = 'none';
+}
+
+function toggle() {
+  open = !open;
+  document.getElementById('panel').classList.toggle('open', open);
+  // Tell parent to resize iframe
+  var h = open ? 530 : 110;
+  try { window.parent.resizeCoach(h); } catch(e) {}
+  if (open) {
+    if (document.getElementById('msgs').children.length === 0) {
+      addMsg("Hey Magnum! Ask me anything about your NYC 2026 training plan — pacing, nutrition, strength, the science behind the workouts, or any specific week.", 'bot');
+    }
+    setTimeout(function() { document.getElementById('inp').focus(); }, 50);
+  }
+}
+
+function send() {
+  var inp = document.getElementById('inp'), q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  addMsg(q, 'user');
+  setTimeout(function() { addMsg(answer(q), 'bot'); }, 220);
+}
+
+function ask(el) {
+  document.getElementById('inp').value = el.textContent;
+  send();
+}
+</script>
+</body>
+</html>
