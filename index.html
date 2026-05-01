@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
         return top > 0 ? best.a : 'Ask me about training principles, gel timing, tempo runs, strides, 20-milers, taper, race pacing, or strength!';
       }
-      var isOpen = false;
+      window._cOpen = false; var isOpen = false;
       function addMsg(t, r) {
         var m = document.getElementById('c-msgs');
         var d = document.createElement('div'); d.className = 'cmsg ' + (r === 'bot' ? 'b' : 'u');
@@ -247,26 +247,26 @@ document.addEventListener('DOMContentLoaded', async function() {
         var chips = document.getElementById('c-chips');
         if (chips) chips.style.display = 'none';
       }
-      function doSend() {
+      window.doSend = function doSend() {
         var inp = document.getElementById('c-inp'), q = inp.value.trim();
         if (!q) return; inp.value = '';
         addMsg(q, 'user');
         var a = ans(q);
         setTimeout(function() { addMsg(a, 'bot'); }, 220);
       }
-      function toggle() {
-        isOpen = !isOpen;
-        document.getElementById('coach-panel').classList.toggle('open', isOpen);
-        if (isOpen && !document.getElementById('c-msgs').children.length) {
+      window._toggle = function toggle() {
+        window._cOpen = !window._cOpen;
+        document.getElementById('coach-panel').classList.toggle('open', window._cOpen);
+        if (window._cOpen && !document.getElementById('c-msgs').children.length) {
           addMsg('Hey Magnum! Ask me anything about your NYC 2026 training plan - pacing, nutrition, strength, the science behind the workouts, or any specific week.', 'bot');
         }
-        if (isOpen) setTimeout(function() { var i = document.getElementById('c-inp'); if(i) i.focus(); }, 50);
+        if (window._cOpen) setTimeout(function() { var i = document.getElementById('c-inp'); if(i) i.focus(); }, 50);
       }
       var btn = document.createElement('button');
       btn.id = 'coach-btn';
       btn.title = 'Ask your coach';
       btn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path></svg>';
-      btn.onclick = toggle;
+      btn.onclick = window._toggle;
       document.body.appendChild(btn);
       var panel = document.createElement('div'); panel.id = 'coach-panel';
       var hdr = '<div id="c-hdr"><div><div id="c-lbl">NYC 2026</div><div id="c-ttl">Training Coach</div></div>';
