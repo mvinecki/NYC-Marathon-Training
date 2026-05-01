@@ -919,30 +919,15 @@ As for 3:35 (8:11/mi) — that's a significant jump from sub-4. Doable in a futu
   window.toggleCoach = toggle;
   document.getElementById('coach-btn') && (document.getElementById('coach-btn').onclick = toggle);
 
-  // Wait for app to finish rendering, then inject
-  function tryBuild() {
-    var loading = document.getElementById('__bundler_loading');
-    if (!loading || loading.style.display === 'none' || !document.body.contains(loading)) {
-      build();
-    } else {
-      // Watch for loading div removal
-      var obs = new MutationObserver(function(mutations) {
-        if (!document.getElementById('__bundler_loading') || document.getElementById('__bundler_loading').style.display === 'none') {
-          obs.disconnect();
-          setTimeout(build, 200);
-        }
-      });
-      obs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
-      // Fallback timeout
-      setTimeout(build, 3000);
-    }
+  // Heartbeat: ensure button always exists, re-add if app removes it
+  function ensure() {
+    if (!document.getElementById('coach-btn')) build();
   }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryBuild);
-  } else {
-    tryBuild();
-  }
+  // Initial inject after app renders
+  setTimeout(build, 500);
+  setTimeout(build, 1500);
+  // Keep alive every 800ms
+  setInterval(ensure, 800);
 })();
 </script>
 
