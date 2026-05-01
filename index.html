@@ -269,16 +269,29 @@ document.addEventListener('DOMContentLoaded', async function() {
       btn.onclick = window._toggle;
       document.body.appendChild(btn);
       var panel = document.createElement('div'); panel.id = 'coach-panel';
-      var hdr = '<div id="c-hdr"><div><div id="c-lbl">NYC 2026</div><div id="c-ttl">Training Coach</div></div>';
-      hdr += '<button id="c-x" onclick="document.getElementById(\"coach-panel\").classList.remove(\"open\");isOpen=false;">&times;</button></div>';
-      var chips = '<div id="c-chips">';
+      var hdrEl = document.createElement('div'); hdrEl.id = 'c-hdr';
+      var hdrInfo = document.createElement('div');
+      var lbl = document.createElement('div'); lbl.id = 'c-lbl'; lbl.textContent = 'NYC 2026';
+      var ttl = document.createElement('div'); ttl.id = 'c-ttl'; ttl.textContent = 'Training Coach';
+      hdrInfo.appendChild(lbl); hdrInfo.appendChild(ttl);
+      var xBtn = document.createElement('button'); xBtn.id = 'c-x'; xBtn.textContent = '×';
+      xBtn.onclick = window._toggle;
+      hdrEl.appendChild(hdrInfo); hdrEl.appendChild(xBtn);
+      var msgsEl = document.createElement('div'); msgsEl.id = 'c-msgs';
+      var chipsEl = document.createElement('div'); chipsEl.id = 'c-chips';
       ['Where do training principles come from?','When should I take gels?','Why two 20-milers?','What is a tempo run?'].forEach(function(q) {
-        chips += '<span class="cchip" onclick="document.getElementById(\"c-inp\").value=this.textContent;doSend()">' + q + '</span>';
+        var chip = document.createElement('span'); chip.className = 'cchip'; chip.textContent = q;
+        chip.onclick = function() { document.getElementById('c-inp').value = this.textContent; window.doSend(); };
+        chipsEl.appendChild(chip);
       });
-      chips += '</div>';
-      var foot = '<div id="c-foot"><input id="c-inp" placeholder="Ask your coach..." onkeydown="if(event.key===\"Enter\")doSend()"/>';
-      foot += '<button id="c-snd" onclick="doSend()"><svg viewBox="0 0 24 24" width="14" height="14" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg></button></div>';
-      panel.innerHTML = hdr + '<div id="c-msgs"></div>' + chips + foot;
+      var footEl = document.createElement('div'); footEl.id = 'c-foot';
+      var inp = document.createElement('input'); inp.id = 'c-inp'; inp.placeholder = 'Ask your coach...';
+      inp.onkeydown = function(e) { if (e.key === 'Enter') window.doSend(); };
+      var sndBtn = document.createElement('button'); sndBtn.id = 'c-snd';
+      sndBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>';
+      sndBtn.onclick = window.doSend;
+      footEl.appendChild(inp); footEl.appendChild(sndBtn);
+      panel.appendChild(hdrEl); panel.appendChild(msgsEl); panel.appendChild(chipsEl); panel.appendChild(footEl);
       document.body.appendChild(panel);
     }, 800);
   } catch (err) {
