@@ -713,52 +713,100 @@ As for 3:35 (8:11/mi) — that's a significant jump from sub-4. Doable in a futu
 (function injectCoach() {
   var STYLES = `
     #coach-btn {
-      position: fixed !important; bottom: 28px !important; right: 28px !important;
-      width: 58px; height: 58px; border-radius: 50%;
-      background: linear-gradient(135deg, #e8723a, #d45f25);
+      position: fixed !important; bottom: 24px !important; right: 24px !important;
+      width: 46px; height: 46px; border-radius: 50%;
+      background: #1a1a1a;
       border: none; cursor: pointer;
-      box-shadow: 0 4px 16px rgba(232,114,58,0.5);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
       display: flex !important; align-items: center; justify-content: center;
       z-index: 2147483647 !important;
-      transition: transform 0.2s;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    #coach-btn:hover { transform: scale(1.1); }
+    #coach-btn:hover { transform: scale(1.06); box-shadow: 0 4px 16px rgba(0,0,0,0.22); }
     #coach-panel {
-      position: fixed !important; bottom: 100px !important; right: 28px !important;
-      width: 370px; max-height: 500px;
-      background: #1a1f2e; border-radius: 16px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      position: fixed !important; bottom: 82px !important; right: 24px !important;
+      width: 310px; max-height: 440px;
+      background: #faf9f5;
+      border-radius: 14px;
+      border: 1px solid #e8e4dc;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
       flex-direction: column;
       z-index: 2147483647 !important;
       overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       display: none !important;
     }
     #coach-panel.open { display: flex !important; }
-    #coach-header { background: linear-gradient(135deg,#e8723a,#d45f25); padding:14px 18px; display:flex; align-items:center; justify-content:space-between; }
-    #coach-header-info { display:flex; align-items:center; gap:10px; }
-    #coach-avatar { width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px; }
-    #coach-title { color:#fff;font-weight:700;font-size:14px; }
-    #coach-sub { color:rgba(255,255,255,0.8);font-size:11px; }
-    #coach-x { background:none;border:none;color:#fff;font-size:22px;cursor:pointer;opacity:0.8;line-height:1; }
-    #coach-x:hover { opacity:1; }
-    #coach-msgs { flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px; }
-    .cmsg { display:flex;gap:8px; }
-    .cmsg.user { flex-direction:row-reverse; }
-    .cbubble { padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;max-width:84%;white-space:pre-wrap; }
-    .cmsg.bot .cbubble { background:#2a3146;color:#e8eaf0;border-bottom-left-radius:3px; }
-    .cmsg.user .cbubble { background:linear-gradient(135deg,#e8723a,#d45f25);color:#fff;border-bottom-right-radius:3px; }
-    .cicon { width:26px;height:26px;border-radius:50%;background:#2a3146;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:2px; }
-    #coach-chips { padding:0 14px 8px;display:flex;flex-wrap:wrap;gap:5px; }
-    .chip { background:#2a3146;color:#9ba8c0;border:1px solid #3a4158;border-radius:20px;padding:4px 11px;font-size:11.5px;cursor:pointer; }
-    .chip:hover { background:#3a4158;color:#e8eaf0; }
-    #coach-footer { padding:10px 14px;border-top:1px solid #2a3146;display:flex;gap:8px;align-items:center; }
-    #coach-input { flex:1;background:#2a3146;border:1px solid #3a4158;border-radius:20px;padding:8px 14px;color:#e8eaf0;font-size:13px;outline:none;font-family:inherit; }
-    #coach-input:focus { border-color:#e8723a; }
-    #coach-input::placeholder { color:#5a6480; }
-    #coach-send { width:34px;height:34px;border-radius:50%;background:#e8723a;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-    #coach-send:hover { background:#d45f25; }
-  `;
+    #coach-header {
+      background: #faf9f5;
+      border-bottom: 1px solid #e8e4dc;
+      padding: 12px 14px 10px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    #coach-header-info { display: flex; align-items: center; gap: 8px; }
+    #coach-label {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #999;
+      margin-bottom: 1px;
+    }
+    #coach-title { color: #1a1a1a; font-weight: 600; font-size: 13px; line-height: 1; }
+    #coach-x {
+      background: none; border: none; color: #999; font-size: 18px;
+      cursor: pointer; line-height: 1; padding: 2px 4px; border-radius: 4px;
+    }
+    #coach-x:hover { background: #eee; color: #333; }
+    #coach-msgs {
+      flex: 1; overflow-y: auto; padding: 12px;
+      display: flex; flex-direction: column; gap: 8px;
+      scrollbar-width: thin; scrollbar-color: #ddd transparent;
+    }
+    .cmsg { display: flex; gap: 6px; }
+    .cmsg.user { flex-direction: row-reverse; }
+    .cbubble {
+      padding: 8px 11px; border-radius: 12px;
+      font-size: 12.5px; line-height: 1.5; max-width: 86%; white-space: pre-wrap;
+    }
+    .cmsg.bot .cbubble {
+      background: #fff; color: #2a2a2a;
+      border: 1px solid #e8e4dc;
+      border-bottom-left-radius: 3px;
+    }
+    .cmsg.user .cbubble {
+      background: #1a1a1a; color: #fff;
+      border-bottom-right-radius: 3px;
+    }
+    .cicon {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: #f0ede8; border: 1px solid #e8e4dc;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; flex-shrink: 0; margin-top: 2px;
+    }
+    #coach-chips { padding: 0 12px 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+    .chip {
+      background: #fff; color: #555; border: 1px solid #e0dcd5;
+      border-radius: 20px; padding: 4px 10px; font-size: 11px; cursor: pointer;
+      transition: all 0.12s;
+    }
+    .chip:hover { background: #f0ede8; color: #1a1a1a; border-color: #ccc; }
+    #coach-footer {
+      padding: 9px 12px; border-top: 1px solid #e8e4dc;
+      display: flex; gap: 6px; align-items: center;
+      background: #faf9f5;
+    }
+    #coach-input {
+      flex: 1; background: #fff; border: 1px solid #e0dcd5;
+      border-radius: 18px; padding: 7px 12px; color: #1a1a1a;
+      font-size: 12.5px; outline: none; font-family: inherit;
+    }
+    #coach-input:focus { border-color: #999; }
+    #coach-input::placeholder { color: #aaa; }
+    #coach-send {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: #1a1a1a; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    #coach-send:hover { background: #333; }
+  ``;
 
   var QA = [
     { k:["principle","philosophy","where.*come","method","source","research","hansons","higdon","pfitzinger","canova","80/20","nick bear","based on","behind.*plan"], a:"This plan blends four elite methodologies:\n\n🏆 Hal Higdon — 10% mileage increase rule, recovery weeks every 3-4 weeks\n🏆 Hansons Method — Two 20-milers to simulate race-day fatigue\n🏆 Pfitzinger — Periodization phases (Base→Build→Peak→Taper), 40+ mile peak weeks\n🏆 Renato Canova — Race-pace miles at the end of long runs (last 2mi @ 9:09/mi, weeks 14-20)\n🏆 Matt Fitzgerald (80/20) — ~80% easy Zone 2, 20% quality work\n🏆 Nick Bear — Integrating serious strength training with marathon prep" },
@@ -799,7 +847,7 @@ As for 3:35 (8:11/mi) — that's a significant jump from sub-4. Doable in a futu
     var btn = document.createElement('button');
     btn.id = 'coach-btn';
     btn.title = 'Ask your coach';
-    btn.innerHTML = '<svg viewBox="0 0 24 24" width="26" height="26" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>';
     btn.onclick = toggle;
     document.body.appendChild(btn);
 
@@ -809,8 +857,10 @@ As for 3:35 (8:11/mi) — that's a significant jump from sub-4. Doable in a futu
     panel.innerHTML = `
       <div id="coach-header">
         <div id="coach-header-info">
-          <div id="coach-avatar">🏃</div>
-          <div><div id="coach-title">Training Coach</div><div id="coach-sub">Ask anything about your plan</div></div>
+          <div>
+            <div id="coach-label">NYC 2026</div>
+            <div id="coach-title">Training Coach</div>
+          </div>
         </div>
         <button id="coach-x" onclick="document.getElementById('coach-panel').classList.remove('open')">×</button>
       </div>
