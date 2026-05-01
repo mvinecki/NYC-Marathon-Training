@@ -157,6 +157,130 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (window.Babel && typeof window.Babel.transformScriptTags === 'function') {
       window.Babel.transformScriptTags();
     }
+    // Inject coach widget after app renders into new document
+    setTimeout(function addCoach() {
+      if (document.getElementById('coach-btn')) return;
+      var st = document.createElement('style');
+      st.textContent = [
+        '#coach-btn{position:fixed!important;bottom:24px!important;right:24px!important;',
+        'width:46px;height:46px;border-radius:50%;background:#1a1a1a;border:none;cursor:pointer;',
+        'display:flex!important;align-items:center;justify-content:center;',
+        'z-index:2147483647!important;box-shadow:0 2px 12px rgba(0,0,0,.18);transition:transform .15s}',
+        '#coach-btn:hover{transform:scale(1.08)}',
+        '#coach-panel{position:fixed!important;bottom:82px!important;right:24px!important;',
+        'width:310px;max-height:440px;background:#faf9f5;border-radius:14px;',
+        'border:1px solid #e8e4dc;box-shadow:0 4px 24px rgba(0,0,0,.12);',
+        'flex-direction:column;z-index:2147483647!important;overflow:hidden;',
+        'display:none!important;font-family:-apple-system,BlinkMacSystemFont,sans-serif}',
+        '#coach-panel.open{display:flex!important}',
+        '#c-hdr{background:#faf9f5;border-bottom:1px solid #e8e4dc;padding:12px 14px 10px;',
+        'display:flex;align-items:center;justify-content:space-between}',
+        '#c-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#999;margin-bottom:2px}',
+        '#c-ttl{color:#1a1a1a;font-weight:600;font-size:13px}',
+        '#c-x{background:none;border:none;color:#999;font-size:18px;cursor:pointer;padding:2px 5px;border-radius:4px;line-height:1}',
+        '#c-x:hover{background:#eee}',
+        '#c-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}',
+        '#c-chips{padding:0 12px 8px;display:flex;flex-wrap:wrap;gap:4px}',
+        '#c-foot{padding:9px 12px;border-top:1px solid #e8e4dc;display:flex;gap:6px;align-items:center;background:#faf9f5}',
+        '.cmsg{display:flex;gap:6px}.cmsg.u{flex-direction:row-reverse}',
+        '.cbbl{padding:8px 11px;border-radius:12px;font-size:12.5px;line-height:1.5;max-width:86%;white-space:pre-wrap}',
+        '.cmsg.b .cbbl{background:#fff;color:#2a2a2a;border:1px solid #e8e4dc;border-bottom-left-radius:3px}',
+        '.cmsg.u .cbbl{background:#1a1a1a;color:#fff;border-bottom-right-radius:3px}',
+        '.cico{width:22px;height:22px;border-radius:50%;background:#f0ede8;border:1px solid #e8e4dc;',
+        'display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:2px}',
+        '.cchip{background:#fff;color:#555;border:1px solid #e0dcd5;border-radius:20px;padding:4px 10px;font-size:11px;cursor:pointer}',
+        '.cchip:hover{background:#f0ede8}',
+        '#c-inp{flex:1;background:#fff;border:1px solid #e0dcd5;border-radius:18px;',
+        'padding:7px 12px;color:#1a1a1a;font-size:12.5px;outline:none;font-family:inherit}',
+        '#c-inp:focus{border-color:#999}#c-inp::placeholder{color:#aaa}',
+        '#c-snd{width:30px;height:30px;border-radius:50%;background:#1a1a1a;border:none;',
+        'cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}',
+        '#c-snd:hover{background:#333}'
+      ].join('');
+      document.head.appendChild(st);
+      var QA = [
+        {k:['principle','philosophy','method','source','hansons','higdon','pfitzinger','canova','80.20','nick bear','methodology','where do','where.*come'],
+         a:'This plan blends four elite methodologies:\n\nHal Higdon - 10% mileage increase rule, recovery weeks every 3-4 weeks\nHansons Method - Two 20-milers to simulate race-day fatigue\nPfitzinger - Periodization phases, 40+ mile peak weeks\nRenato Canova - Race-pace miles at end of long runs (weeks 14-20)\nMatt Fitzgerald (80/20) - ~80% easy Zone 2, 20% quality work\nNick Bear - Integrating strength training with marathon prep'},
+        {k:['gel','fuel','nutrition','eat','carb','maurten','gu','when.*gel'],
+         a:'Fueling rules:\n\nUnder 60 min: water only\n60-75 min: optional gel at 45 min\n75+ min: gel every 40-45 min starting mile 5-6\n\nRace day: gels at miles 5, 10, 15, 20\n\nPractice this EXACT schedule on long runs. Never use a new gel on race day.'},
+        {k:['20.?mile','twenty','two 20','longest','20 mile'],
+         a:'You have TWO 20-milers - intentional Hansons-style:\n\nWeek 16 (Aug 17): First 20-miler. Start slow. Just finish.\nWeek 18 (Aug 31): Second 20-miler. Focus on negative splits.\n\nWhy two? Builds confidence - by race day 26.2 feels familiar.'},
+        {k:['tempo','threshold','wednesday','what.*tempo','hard run'],
+         a:'Tempo runs start Wednesday Week 6 (Jun 8).\n\nStructure: 1-2mi warmup -> middle miles at 8:30-9:00/mi -> 1mi cooldown\n\nEffort: 7/10, comfortably hard. Raises lactate threshold - #1 predictor of marathon performance.'},
+        {k:['stride','20 second','strides'],
+         a:'Strides on Thursdays starting Week 14 (Aug 3).\n\n6 x 20-sec at ~7:30-8:00/mi:\n5-sec buildup -> hold 10 sec -> ease off 5 sec\n60-90 sec walk rest between each'},
+        {k:['recover','recovery week','down week'],
+         a:'Recovery weeks: 5, 9, 13, 17, 21 - every 3-4 weeks.\n\nMileage drops 20-25%, all runs easy, no tempo.\n\nYour body adapts DURING recovery, not during hard weeks.'},
+        {k:['taper','race week','week 22','week 23','week 24','week 25','week 26'],
+         a:'Taper starts Week 22 (Sep 28):\n\nWk 22: 35mi -> Wk 23: 28mi -> Wk 24: 22mi -> Wk 25: 16mi -> Wk 26: 10mi\n\nTaper anxiety is normal. Sleep 9hrs/night. No new foods or gear.'},
+        {k:['lift','strength','weight','squat','deadlift','gym'],
+         a:'Strength in 3 phases:\n\nPhase 1 (Wks 1-9): Heavy, 3-5x6-8 reps\nPhase 2 (Wks 10-20): Moderate, 3x10-12 reps\nPhase 3 (Wks 21-26): Light maintenance\n\nAlways lift AFTER your run, or 6+ hours apart.'},
+        {k:['pace','9:09','sub 4','goal pace','split','how fast'],
+         a:'Goal: 9:09/mile for 3:59:59\n\nMile 5: 0:45:45\nMile 10: 1:31:30\nHalf: 2:00:00\nMile 20: 3:03:00\nFinish: 3:59:59'},
+        {k:['nyc','new york','course','race day','central park','verrazano','november'],
+         a:'NYC Marathon - Nov 1, 2026:\n\nStatem Island -> Brooklyn -> Queens -> Bronx -> Manhattan -> Central Park\n\nMile 1: Verrazano Bridge - go easy uphill!\nMile 15: Queensboro Bridge - mentally tough\nMile 16: First Ave - massive crowd energy\nMiles 23-26: Central Park hills - hardest when most tired'},
+        {k:['mileage','miles per week','peak week','weekly miles'],
+         a:'Base (Wks 1-5): 15-22mi/wk\nBuild (Wks 6-13): 25-35mi/wk\nPeak (Wks 14-20): 37-43mi/wk\nTaper (Wks 21-26): 35->10mi/wk'},
+        {k:['long run','saturday','longest run'],
+         a:'Long runs on Saturdays. Wks 14-20: last 2mi at race pace (9:09/mi). Keep effort conversational 10:00-10:45/mi.'},
+        {k:['injury','hurt','miss','sore','knee','shin'],
+         a:'Missed training:\n1-2 runs: resume normally\nFull week: return at 70% mileage\n2 weeks: drop back 2 weeks in plan\nMinor injury: cross-train at same effort'}
+      ];
+      function ans(q) {
+        var ql = q.toLowerCase(), best = null, top = 0;
+        QA.forEach(function(item) {
+          var s = 0;
+          item.k.forEach(function(k) {
+            try { if (new RegExp(k,'i').test(ql)) s++; } catch(e) { if (ql.indexOf(k) !== -1) s++; }
+          });
+          if (s > top) { top = s; best = item; }
+        });
+        return top > 0 ? best.a : 'Ask me about training principles, gel timing, tempo runs, strides, 20-milers, taper, race pacing, or strength!';
+      }
+      var isOpen = false;
+      function addMsg(t, r) {
+        var m = document.getElementById('c-msgs');
+        var d = document.createElement('div'); d.className = 'cmsg ' + (r === 'bot' ? 'b' : 'u');
+        var ic = document.createElement('div'); ic.className = 'cico'; ic.textContent = r === 'bot' ? 'C' : 'M';
+        var b = document.createElement('div'); b.className = 'cbbl'; b.textContent = t;
+        d.appendChild(ic); d.appendChild(b); m.appendChild(d); m.scrollTop = m.scrollHeight;
+        var chips = document.getElementById('c-chips');
+        if (chips) chips.style.display = 'none';
+      }
+      function doSend() {
+        var inp = document.getElementById('c-inp'), q = inp.value.trim();
+        if (!q) return; inp.value = '';
+        addMsg(q, 'user');
+        var a = ans(q);
+        setTimeout(function() { addMsg(a, 'bot'); }, 220);
+      }
+      function toggle() {
+        isOpen = !isOpen;
+        document.getElementById('coach-panel').classList.toggle('open', isOpen);
+        if (isOpen && !document.getElementById('c-msgs').children.length) {
+          addMsg('Hey Magnum! Ask me anything about your NYC 2026 training plan - pacing, nutrition, strength, the science behind the workouts, or any specific week.', 'bot');
+        }
+        if (isOpen) setTimeout(function() { var i = document.getElementById('c-inp'); if(i) i.focus(); }, 50);
+      }
+      var btn = document.createElement('button');
+      btn.id = 'coach-btn';
+      btn.title = 'Ask your coach';
+      btn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path></svg>';
+      btn.onclick = toggle;
+      document.body.appendChild(btn);
+      var panel = document.createElement('div'); panel.id = 'coach-panel';
+      var hdr = '<div id="c-hdr"><div><div id="c-lbl">NYC 2026</div><div id="c-ttl">Training Coach</div></div>';
+      hdr += '<button id="c-x" onclick="document.getElementById(\"coach-panel\").classList.remove(\"open\");isOpen=false;">&times;</button></div>';
+      var chips = '<div id="c-chips">';
+      ['Where do training principles come from?','When should I take gels?','Why two 20-milers?','What is a tempo run?'].forEach(function(q) {
+        chips += '<span class="cchip" onclick="document.getElementById(\"c-inp\").value=this.textContent;doSend()">' + q + '</span>';
+      });
+      chips += '</div>';
+      var foot = '<div id="c-foot"><input id="c-inp" placeholder="Ask your coach..." onkeydown="if(event.key===\"Enter\")doSend()"/>';
+      foot += '<button id="c-snd" onclick="doSend()"><svg viewBox="0 0 24 24" width="14" height="14" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg></button></div>';
+      panel.innerHTML = hdr + '<div id="c-msgs"></div>' + chips + foot;
+      document.body.appendChild(panel);
+    }, 800);
   } catch (err) {
     setStatus('Error unpacking: ' + err.message);
     console.error('Bundle unpack error:', err);
